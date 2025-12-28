@@ -763,6 +763,26 @@ function setupViewTabs(){
   });
 })();
 
+// Temporary: enforce light theme to avoid browser/extension dark-mode overrides
+function enforceLightTheme(){
+  try{
+    if(document.getElementById('force-light-mode')) return;
+    const css = `
+      :root{ --bg:#fff !important; --fg:#111 !important; --muted:#666 !important; --line:#e6e6e6 !important; }
+      html,body{ background:#fff !important; color:#111 !important; }
+      header, .week-block, table, .panel, .changes, .meta-block{ background:#fff !important; }
+      .tag{ background-clip:padding-box !important }
+    `;
+    const s = document.createElement('style'); s.id = 'force-light-mode'; s.appendChild(document.createTextNode(css));
+    document.head && document.head.appendChild(s);
+  }catch(e){ console.warn('enforceLightTheme failed', e); }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  // apply after short delay so it's visible even if an extension toggles theme later
+  setTimeout(enforceLightTheme, 50);
+});
+
 // Absences
 document.getElementById("absBtn").addEventListener("click", async ()=>{
   const ids = Array.from(document.getElementById("absEmp").selectedOptions).map(o=>o.value);
