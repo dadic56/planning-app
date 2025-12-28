@@ -10,9 +10,13 @@ const weekContexts = Array.from({length:2}, (_,idx)=>{
   return {
     root,
     tbody: document.getElementById(`tbody${idx}`),
+    tbodyAdjusted: document.getElementById(`tbody${idx}_adjusted`),
     coverCells: Array.from(root.querySelectorAll('td[data-cover]')),
+    coverCellsAdjusted: Array.from(root.querySelectorAll('td[data-cover-Adj]')),
     ocov: root.querySelector('[data-role="open-label"]'),
     fcov: root.querySelector('[data-role="close-label"]'),
+    ocovAdj: root.querySelector('[data-role="open-label-Adj"]'),
+    fcovAdj: root.querySelector('[data-role="close-label-Adj"]'),
     title: document.getElementById(`weekTitle${idx}`),
     subtitle: document.getElementById(`weekSubtitle${idx}`),
   };
@@ -32,6 +36,17 @@ function slotMinutes(slot){ return Math.max(0, minStr(slot.end) - minStr(slot.st
 function formatDateFR(iso){
   const d = new Date(iso + "T00:00:00");
   return d.toLocaleDateString("fr-FR", {day:"2-digit", month:"2-digit"});
+}
+
+function isoWeekNumber(d){
+  // d is Date
+  const date = new Date(d.getTime());
+  // Set to nearest Thursday: current date + 4 - current day number (Mon=1..Sun=7)
+  const day = date.getDay() || 7;
+  date.setDate(date.getDate() + 4 - day);
+  const yearStart = new Date(date.getFullYear(), 0, 1);
+  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return weekNo;
 }
 
 function employeeById(id){
@@ -599,6 +614,18 @@ async function refresh(){
     renderChanges(allAdjusted, allViolations);
     renderAbsenceSummary(uniqueAbsences);
 
+    // Update main week info under header (show week number and range for first displayed week)
+    try{
+      const mainInfo = document.getElementById('mainWeekInfo');
+      if(mainInfo && perWeek.length>0){
+        const first = perWeek[0];
+        const mondayISO = first.monday;
+        const sundayISO = first.sunday;
+        const wno = isoWeekNumber(new Date(mondayISO + 'T00:00:00'));
+        mainInfo.textContent = `Semaine n°${wno} — du ${formatDateFR(mondayISO)} au ${formatDateFR(sundayISO)}`;
+      }
+    }catch(_e){/* ignore */}
+
     const nameToId = new Map((employeesCache||[]).map(e=>[e.name, e.id]));
     const caps = new Map((employeesCache||[]).map(e=>[
       e.id,
@@ -616,7 +643,6 @@ async function refresh(){
       if(ctx.subtitle) ctx.subtitle.textContent = `${formatDateFR(weekData.monday)} → ${formatDateFR(weekData.sunday)}`;
 
       const map = groupByEmployeeAndDay(weekData.base, weekData.adjusted);
-      const useAdjusted = weekData.adjusted.length > 0;
       const mondayDate = new Date(`${weekData.monday}T00:00:00`);
       const weekDates = Array.from({length:7}, (_,dayIdx)=> toISO(addDays(mondayDate, dayIdx)));
 
@@ -639,11 +665,31 @@ async function refresh(){
         }
       });
 
-      const cov = coverageByDay(map, useAdjusted);
-      const hours = weeklyHours(map, useAdjusted, absenceByName, weekDates);
+      // compute coverage and hours separately for base and adjusted views
+      const covBase = coverageByDay(map, false);
+      const covAdj = coverageByDay(map, true);
+      const hoursBase = weeklyHours(map, false, absenceByName, weekDates);
+      const hoursAdj = weeklyHours(map, true, absenceByName, weekDates);
       const absentIds = new Set(weekData.absences.map(a=>a.employee_id));
 
-      renderGrid(map, cov, hours, {useAdjusted, nameToId, absentIds, caps, weekDates, absenceDays: absenceById, context: ctx});
+      // render base into primary tbody
+      renderGrid(map, covBase, hoursBase, {useAdjusted:false, nameToId, absentIds, caps, weekDates, absenceDays: absenceById, context: ctx});
+
+      // render adjusted into adjusted tbody (if element exists)
+      const adjustedBlockEl = document.getElementById(`adjustedBlock${idx}`);
+      if(ctx && ctx.tbodyAdjusted){
+        if(weekData.adjusted && weekData.adjusted.length > 0){
+          adjustedBlockEl && adjustedBlockEl.classList.remove('hidden');
+          const adjCtx = Object.assign({}, ctx, { tbody: ctx.tbodyAdjusted, coverCells: ctx.coverCellsAdjusted, ocov: ctx.ocovAdj, fcov: ctx.fcovAdj });
+          renderGrid(map, covAdj, hoursAdj, {useAdjusted:true, nameToId, absentIds, caps, weekDates, absenceDays: absenceById, context: adjCtx});
+        }else{
+          adjustedBlockEl && adjustedBlockEl.classList.add('hidden');
+          if(ctx.tbodyAdjusted) ctx.tbodyAdjusted.innerHTML = "";
+          if(ctx.coverCellsAdjusted) ctx.coverCellsAdjusted.forEach(c=>c.innerHTML='');
+          if(ctx.ocovAdj) ctx.ocovAdj.textContent = "";
+          if(ctx.fcovAdj) ctx.fcovAdj.textContent = "";
+        }
+      }
     });
 
     for(let idx = perWeek.length; idx < weekContexts.length; idx++){

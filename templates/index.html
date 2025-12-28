@@ -19,6 +19,9 @@
   .spacer{flex:1}
   .grid{overflow:auto;padding:12px}
   .weeks-wrapper{display:flex;flex-direction:column;gap:32px}
+  .subtable{margin-top:6px}
+  .adjusted-block{border-top:1px dashed #e6eef0;padding-top:10px;margin-top:12px}
+  .title-block{display:flex;flex-direction:column;align-items:flex-start;margin-right:12px}
   .week-block{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.08);padding:12px}
   .week-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
   .week-title{margin:0;font-size:18px;color:#0f172a}
@@ -83,7 +86,10 @@
 </head>
 <body>
 <header>
-  <h2>Planning Hebdomadaire</h2>
+  <div class="title-block">
+    <h2>Planning Hebdomadaire</h2>
+    <div id="mainWeekInfo" class="small muted" style="margin-top:4px"></div>
+  </div>
   <div class="toolbar">
     <label>Semaine (lundi) <input id="monday" type="date"></label>
     <label><input id="sun" type="checkbox"> Dimanche ouvert</label>
@@ -102,6 +108,38 @@
   <a href="/snapshots" class="btn btn-secondary">Archives</a>
   <a href="/base" class="btn btn-secondary">Éditer planning de base</a>
 </header>
+
+<script>
+  (function(){
+    function fmtDate(d){
+      const date = (typeof d === 'string') ? new Date(d + 'T00:00:00') : d;
+      return date.toLocaleDateString('fr-FR',{day:'2-digit', month:'2-digit'});
+    }
+    function isoWeekNumber(d){
+      const date = new Date(d.getTime());
+      const day = date.getDay() || 7;
+      date.setDate(date.getDate() + 4 - day);
+      const yearStart = new Date(date.getFullYear(), 0, 1);
+      return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+    }
+    function updateMain(){
+      const el = document.getElementById('mainWeekInfo');
+      const monday = document.getElementById('monday').value;
+      const wk = Number(document.getElementById('weekCount')?.value || 1);
+      if(!monday){ el.textContent = ''; return; }
+      const m = new Date(monday + 'T00:00:00');
+      const last = new Date(m);
+      last.setDate(last.getDate() + wk*7 - 1);
+      if(wk === 1){ el.textContent = `Semaine n°${isoWeekNumber(m)} — du ${fmtDate(m)} au ${fmtDate(last)}`; }
+      else { el.textContent = `Semaines — du ${fmtDate(m)} au ${fmtDate(last)}`; }
+    }
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.getElementById('monday').addEventListener('change', updateMain);
+      const wc = document.getElementById('weekCount'); if(wc) wc.addEventListener('change', updateMain);
+      updateMain();
+    });
+  })();
+</script>
 
 <section class="panel">
   <strong>Absences :</strong>
@@ -122,6 +160,9 @@
         <h3 class="week-title" id="weekTitle0">Semaine 1</h3>
         <p class="week-subtitle" id="weekSubtitle0"></p>
       </div>
+      <!-- Base schedule (bleu) -->
+      <div class="subtable">
+      <h4 class="small">Planning de base</h4>
       <table>
         <thead class="top-sticky">
           <tr>
@@ -139,12 +180,37 @@
           </tr>
         </tfoot>
       </table>
+      </div>
+
+      <!-- Adjusted schedule (vert) rendered below for comparison -->
+      <div class="subtable adjusted-block" id="adjustedBlock0">
+      <h4 class="small">Planning ajusté</h4>
+      <table>
+        <thead class="top-sticky">
+          <tr>
+            <th class="left-sticky">Vendeuse</th>
+            <th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th><th>Samedi</th><th>Dimanche</th>
+            <th>Ouv.</th><th>Ferm.</th><th>Total (h)</th>
+          </tr>
+        </thead>
+        <tbody class="week-body" id="tbody0_adjusted"></tbody>
+        <tfoot>
+          <tr>
+            <td class="left-sticky">Couverture (personnes)</td>
+            <td data-cover-Adj="0"></td><td data-cover-Adj="1"></td><td data-cover-Adj="2"></td><td data-cover-Adj="3"></td><td data-cover-Adj="4"></td><td data-cover-Adj="5"></td><td data-cover-Adj="6"></td>
+            <td data-role="open-label-Adj" class="small"></td><td data-role="close-label-Adj" class="small"></td><td></td>
+          </tr>
+        </tfoot>
+      </table>
+      </div>
     </section>
     <section class="week-block hidden" id="weekBlock1">
       <div class="week-header">
         <h3 class="week-title" id="weekTitle1">Semaine 2</h3>
         <p class="week-subtitle" id="weekSubtitle1"></p>
       </div>
+      <div class="subtable">
+      <h4 class="small">Planning de base</h4>
       <table>
         <thead class="top-sticky">
           <tr>
@@ -162,6 +228,28 @@
           </tr>
         </tfoot>
       </table>
+      </div>
+
+      <div class="subtable adjusted-block" id="adjustedBlock1">
+      <h4 class="small">Planning ajusté</h4>
+      <table>
+        <thead class="top-sticky">
+          <tr>
+            <th class="left-sticky">Vendeuse</th>
+            <th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th><th>Samedi</th><th>Dimanche</th>
+            <th>Ouv.</th><th>Ferm.</th><th>Total (h)</th>
+          </tr>
+        </thead>
+        <tbody class="week-body" id="tbody1_adjusted"></tbody>
+        <tfoot>
+          <tr>
+            <td class="left-sticky">Couverture (personnes)</td>
+            <td data-cover-Adj="0"></td><td data-cover-Adj="1"></td><td data-cover-Adj="2"></td><td data-cover-Adj="3"></td><td data-cover-Adj="4"></td><td data-cover-Adj="5"></td><td data-cover-Adj="6"></td>
+            <td data-role="open-label-Adj" class="small"></td><td data-role="close-label-Adj" class="small"></td><td></td>
+          </tr>
+        </tfoot>
+      </table>
+      </div>
     </section>
   </div>
 </div>
@@ -176,6 +264,6 @@
   <ul id="changes"></ul>
 </div>
 
-<script src="{{ asset_url('app.js') }}"></script>
+<script src="/static/app.js"></script>
 </body>
 </html>
