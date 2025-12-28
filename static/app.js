@@ -732,6 +732,37 @@ async function refresh(){
   }
 }
 
+// --- Tabs for view selection (base / adjusted / both)
+function setupViewTabs(){
+  const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+  if(!tabs.length) return;
+  const setView = (view)=>{
+    const baseTables = document.querySelectorAll('.subtable:not(.adjusted-block)');
+    const adjTables = document.querySelectorAll('.adjusted-block');
+    if(view === 'both'){
+      baseTables.forEach(el=>el.classList.remove('hidden'));
+      adjTables.forEach(el=>el.classList.remove('hidden'));
+    }else if(view === 'base'){
+      baseTables.forEach(el=>el.classList.remove('hidden'));
+      adjTables.forEach(el=>el=>el.classList.add('hidden'));
+    }else if(view === 'adjusted'){
+      baseTables.forEach(el=>el.classList.add('hidden'));
+      adjTables.forEach(el=>el.classList.remove('hidden'));
+    }
+    tabs.forEach(t=>t.classList.toggle('active', t.getAttribute('data-view')===view));
+  };
+  tabs.forEach(t=> t.addEventListener('click', ()=> setView(t.getAttribute('data-view'))));
+  // default
+  setView('both');
+}
+
+(function(){
+  // init tabs after DOM ready
+  document.addEventListener('DOMContentLoaded', ()=>{
+    setupViewTabs();
+  });
+})();
+
 // Absences
 document.getElementById("absBtn").addEventListener("click", async ()=>{
   const ids = Array.from(document.getElementById("absEmp").selectedOptions).map(o=>o.value);

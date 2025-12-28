@@ -112,6 +112,12 @@
   <a href="/base" class="btn btn-secondary">Éditer planning de base</a>
 </header>
 
+<nav class="view-tabs" style="padding:8px 16px;border-bottom:1px solid var(--line);">
+  <button class="tab-btn btn-secondary active" data-view="both" type="button">Vue côte-à-côte</button>
+  <button class="tab-btn btn-secondary" data-view="base" type="button">Voir uniquement base</button>
+  <button class="tab-btn btn-secondary" data-view="adjusted" type="button">Voir uniquement ajusté</button>
+</nav>
+
 <script>
   (function(){
     function fmtDate(d){
