@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>Ouvertures spéciales</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  body{font-family:system-ui,Arial;margin:0;background:#f5f7ff;color:#111;min-height:100vh;display:flex;flex-direction:column}
+  header{padding:24px 40px;border-bottom:1px solid rgba(148,163,184,.3);display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.9);backdrop-filter:blur(6px)}
+  h2{margin:0;font-size:24px;color:#0f172a}
+  main{flex:1;padding:24px 40px;display:flex;gap:32px;align-items:flex-start;min-height:0}
+  .panel{background:#fff;border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.12)}
+  .panel h3{margin:0 0 16px 0;font-size:18px;color:#0f172a}
+  .list-panel{width:360px;flex-shrink:0;display:flex;flex-direction:column;height:calc(100vh - 180px);min-height:420px}
+  .list-panel .toolbar{padding:16px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+  .list-scroll{overflow-y:auto;flex:1}
+  table{width:100%;border-collapse:separate;border-spacing:0}
+  th,td{padding:10px 12px;font-size:13px;border-bottom:1px solid #edf1f7;text-align:left}
+  th{background:#f1f5f9;text-transform:uppercase;letter-spacing:.04em;font-weight:600;font-size:12px;color:#475569;position:sticky;top:0;z-index:1}
+  tr:last-child td{border-bottom:none}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:#f8fafc}
+  tbody tr.selected{background:#e0edff}
+  button{border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .btn-primary{background:#2463eb;color:#fff}
+  .btn-ghost{background:#eef2ff;color:#1d4ed8}
+  .btn-danger{background:#fee2e2;color:#b91c1c}
+  form{display:flex;flex-direction:column;gap:16px;padding:24px;overflow:auto;max-height:calc(100vh - 180px)}
+  label{display:flex;flex-direction:column;font-size:13px;color:#0f172a;gap:6px}
+  input,select,textarea{border:1px solid #cbd5f5;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
+  input[type="checkbox"]{width:auto;padding:0}
+  .inline{flex-direction:row;align-items:center;gap:8px}
+  .shift-list{display:flex;flex-direction:column;gap:12px}
+  .shift-row{display:grid;grid-template-columns:1.2fr repeat(4,1fr) 40px;gap:10px;align-items:center}
+  .shift-row select,.shift-row input{width:100%}
+  .shift-row button{padding:6px 8px}
+  @media(max-width:1200px){
+    main{flex-direction:column}
+    .list-panel{width:100%;height:auto;max-height:40vh}
+    form{max-height:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h2>Ouvertures spéciales</h2>
+  <div style="display:flex;gap:8px">
+    <a href="/" class="btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px">Retour planning</a>
+  </div>
+</header>
+<main>
+  <section class="panel list-panel">
+    <div class="toolbar">
+      <strong>Liste</strong>
+      <button id="newOpening" class="btn-ghost" type="button">Nouvelle</button>
+    </div>
+    <div class="list-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Label</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody id="openingTable">
+          <tr><td colspan="3" style="text-align:center;padding:24px;color:#64748b">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section class="panel" style="flex:1;min-height:420px">
+    <form id="openingForm">
+      <input type="hidden" id="openingId" />
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <label style="flex:1 1 180px">Date
+          <input type="date" id="openingDate" required />
+        </label>
+        <label style="flex:1 1 200px">Label
+          <input type="text" id="openingLabel" placeholder="Fête locale, Dimanche exceptionnel…" />
+        </label>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <label class="inline"><input type="checkbox" id="openingSunday" /> Dimanche / ouverture exceptionnelle</label>
+        <label class="inline"><input type="checkbox" id="openingClosed" /> Fermé toute la journée</label>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap" id="hoursBlock">
+        <label style="flex:1 1 160px">Ouverture
+          <input type="time" id="openingOpen" />
+        </label>
+        <label style="flex:1 1 160px">Fermeture
+          <input type="time" id="openingClose" />
+        </label>
+      </div>
+      <label>Notes
+        <textarea id="openingNotes" placeholder="Infos complémentaires"></textarea>
+      </label>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong>Créneaux affectés</strong>
+          <button type="button" id="addShift" class="btn-ghost">Ajouter un créneau</button>
+        </div>
+        <div class="shift-list" id="shiftList"></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+        <button type="button" id="deleteOpening" class="btn-danger" style="display:none">Supprimer</button>
+        <button type="submit" class="btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </section>
+</main>
+<script src="special.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.cwd": "${workspaceFolder}"
+}
+{
+    "chatgpt.openOnStartup": true
+}

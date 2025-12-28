@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>Planning Hebdomadaire</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  :root{
+    --fg:#111;--muted:#666;--line:#e6e6e6;--bg:#fff;--accent:#0a84ff;
+    --base:#eef6ff;--adjust:#eaffea;--repl:#fff0e0;
+  }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,Arial;margin:0;color:var(--fg);background:var(--bg)}
+  header{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px;border-bottom:1px solid var(--line)}
+  header h2{margin:0 12px 0 0}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 12px;cursor:pointer}
+  .btn-secondary{background:#fff;color:#0a84ff;border:1px solid #0a84ff}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .spacer{flex:1}
+  .grid{overflow:auto;padding:12px}
+  .weeks-wrapper{display:flex;flex-direction:column;gap:32px}
+  .week-block{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.08);padding:12px}
+  .week-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .week-title{margin:0;font-size:18px;color:#0f172a}
+  .week-subtitle{margin:0;font-size:12px;color:#64748b}
+  table{border-collapse:collapse;width:1200px;max-width:100%}
+  th,td{border:1px solid var(--line);padding:6px 8px;font-size:13px;vertical-align:top}
+  th{background:#f7f7f7;text-transform:uppercase;font-weight:600;font-size:12px;letter-spacing:.02em}
+  .left-sticky{position:sticky;left:0;background:#fafafa;z-index:2}
+  .top-sticky{position:sticky;top:0;z-index:3}
+  .name{font-weight:600}
+  .cell{min-width:150px;min-height:64px}
+  .tag{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:4px 8px;border-radius:12px;margin:2px 0;gap:8px}
+  .tag.base{background:var(--base);border:1px solid #cfe7ff}
+  .tag.adjust{background:var(--adjust);border:1px solid #cde9ce}
+  .tag.replacement{background:var(--repl);border:1px solid #ffc187}
+  .tag.modified{box-shadow:0 0 0 2px rgba(255,193,7,.55)}
+  .tag.note{background:#fff;border:1px dashed #bbb;color:var(--muted)}
+  .tag .range{white-space:nowrap}
+  .tag .duration{font-variant-numeric:tabular-nums;color:var(--muted)}
+  .tag.ghost{opacity:.45;text-decoration:line-through}
+  .name.absent{background:#fff4f4;color:#7a0a0a}
+  .badge-absence{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;background:#ffd7d7;color:#7a0a0a;text-transform:uppercase}
+  .day-flag{margin:6px 0 0;padding:6px 8px;border-radius:8px;font-size:12px;display:inline-block}
+  .day-flag.rest{background:#f1f5f9;color:#475569;font-weight:600}
+  .day-flag.absence{background:#ffe6e6;color:#a10e0e;font-weight:600}
+  .muted{color:var(--muted)}
+  tfoot td{font-weight:600;background:#fbfbfb}
+  .small{font-size:11px}
+  .ok{color:#0a7a0a;font-weight:600}
+  .ko{color:#a20b0b;font-weight:600}
+  .panel{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  select[multiple]{min-width:260px;min-height:88px}
+  input[type="text"], input[type="date"]{padding:6px 8px;border:1px solid var(--line);border-radius:6px}
+  .changes{padding:12px;border-top:1px solid var(--line);color:#222}
+  .changes h4{margin:0 0 8px 0}
+  .changes ul{margin:0;padding-left:0;list-style:none}
+  .meta-block{padding:12px;border-top:1px solid var(--line);color:#222}
+  .meta-block h4{margin:0 0 8px 0}
+  .meta-block ul{margin:0;padding-left:18px}
+  .meta-block button.abs-delete{margin-left:8px;font-size:10px;padding:2px 6px;border-radius:8px;border:1px solid #c0392b;background:#ffe6e3;color:#c0392b;cursor:pointer}
+  .meta-block button.abs-delete:hover{background:#ffcfc7}
+
+  .day-total{margin-top:4px;font-size:11px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;color:#333}
+  .total-hours{font-weight:600}
+  .overtime-flag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:#a05b0e;background:#fff0da;border-radius:8px;padding:1px 6px}
+  .overtime-cap-warning{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:#a10e0e;background:#ffe4e4;border-radius:8px;padding:1px 6px}
+  td.overtime-exceeded{background:#fff5f5}
+  .changes li.section{margin-top:10px;font-weight:600;color:#333;text-transform:uppercase;font-size:12px;letter-spacing:.06em}
+  .changes li.item{display:flex;align-items:flex-start;gap:10px;padding:6px 0}
+  .changes li.item + li.item{border-top:1px dashed #e0e0e0;margin-top:4px;padding-top:10px}
+  .changes li.item .badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .changes li.item .badge.sev-critical{background:#ffe4e4;color:#a10e0e}
+  .changes li.item .badge.sev-high{background:#fff0da;color:#a05b0e}
+  .changes li.item .badge.sev-medium{background:#e8f1ff;color:#0a3ea0}
+  .changes li.item .badge.sev-low{background:#eaf8f2;color:#0b6c3c}
+  .changes li.item .badge.sev-ok{background:#f5f5f5;color:#767676}
+  .changes li.item .text{display:flex;flex-direction:column;gap:2px}
+  .changes li.item .text .label{font-weight:600}
+  .changes li.item .text .details{font-size:12px;color:var(--muted)}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<header>
+  <h2>Planning Hebdomadaire</h2>
+  <div class="toolbar">
+    <label>Semaine (lundi) <input id="monday" type="date"></label>
+    <label><input id="sun" type="checkbox"> Dimanche ouvert</label>
+    <label>Durée
+      <select id="weekCount">
+        <option value="1">1 semaine</option>
+        <option value="2">2 semaines</option>
+      </select>
+    </label>
+    <button id="gen" class="btn">Générer planning ajusté</button>
+    <span class="muted small">Base = bleu • Ajusté = vert • Remplacement = orange • Modifié = contour jaune</span>
+    <a href="/health" target="_blank" class="small muted">health</a>
+  </div>
+  <div class="spacer"></div>
+  <button id="snapshotBtn" class="btn btn-secondary">Archiver cette semaine</button>
+  <a href="/snapshots" class="btn btn-secondary">Archives</a>
+  <a href="/base" class="btn btn-secondary">Éditer planning de base</a>
+</header>
+
+<section class="panel">
+  <strong>Absences :</strong>
+  <label>Vendeuses
+    <select id="absEmp" multiple></select>
+  </label>
+  <label>Du <input type="date" id="absStart"></label>
+  <label>au <input type="date" id="absEnd"></label>
+  <label>Motif <input type="text" id="absReason" placeholder="congé, maladie…"></label>
+  <button id="absBtn" class="btn">Déclarer absence(s) + régénérer</button>
+  <span class="small muted">Astuce : Cmd/Ctrl pour sélection multiple</span>
+</section>
+
+<div class="grid">
+  <div class="weeks-wrapper">
+    <section class="week-block" id="weekBlock0">
+      <div class="week-header">
+        <h3 class="week-title" id="weekTitle0">Semaine 1</h3>
+        <p class="week-subtitle" id="weekSubtitle0"></p>
+      </div>
+      <table>
+        <thead class="top-sticky">
+          <tr>
+            <th class="left-sticky">Vendeuse</th>
+            <th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th><th>Samedi</th><th>Dimanche</th>
+            <th>Ouv.</th><th>Ferm.</th><th>Total (h)</th>
+          </tr>
+        </thead>
+        <tbody class="week-body" id="tbody0"></tbody>
+        <tfoot>
+          <tr>
+            <td class="left-sticky">Couverture (personnes)</td>
+            <td data-cover="0"></td><td data-cover="1"></td><td data-cover="2"></td><td data-cover="3"></td><td data-cover="4"></td><td data-cover="5"></td><td data-cover="6"></td>
+            <td data-role="open-label" class="small"></td><td data-role="close-label" class="small"></td><td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+    <section class="week-block hidden" id="weekBlock1">
+      <div class="week-header">
+        <h3 class="week-title" id="weekTitle1">Semaine 2</h3>
+        <p class="week-subtitle" id="weekSubtitle1"></p>
+      </div>
+      <table>
+        <thead class="top-sticky">
+          <tr>
+            <th class="left-sticky">Vendeuse</th>
+            <th>Lundi</th><th>Mardi</th><th>Mercredi</th><th>Jeudi</th><th>Vendredi</th><th>Samedi</th><th>Dimanche</th>
+            <th>Ouv.</th><th>Ferm.</th><th>Total (h)</th>
+          </tr>
+        </thead>
+        <tbody class="week-body" id="tbody1"></tbody>
+        <tfoot>
+          <tr>
+            <td class="left-sticky">Couverture (personnes)</td>
+            <td data-cover="0"></td><td data-cover="1"></td><td data-cover="2"></td><td data-cover="3"></td><td data-cover="4"></td><td data-cover="5"></td><td data-cover="6"></td>
+            <td data-role="open-label" class="small"></td><td data-role="close-label" class="small"></td><td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+  </div>
+</div>
+
+<div class="meta-block">
+  <h4>Absences déclarées</h4>
+  <ul id="absSummary"></ul>
+</div>
+
+<div class="changes">
+  <h4>Résumé des changements (remplacements)</h4>
+  <ul id="changes"></ul>
+</div>
+
+<script src="{{ asset_url('app.js') }}"></script>
+</body>
+</html>
