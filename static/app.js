@@ -625,6 +625,16 @@ async function refresh(){
     const allAbsences = perWeek.flatMap(w => w.absences);
     const uniqueAbsences = Array.from(new Map(allAbsences.map(a => [a.id, a])).values());
 
+    // Debug info: expose counts so we can see what the browser received
+    try{
+      const dbg = document.getElementById('debugInfo');
+      if(dbg){
+        const baseCounts = perWeek.map(w=> (w.base||[]).length );
+        const adjCounts = perWeek.map(w=> (w.adjusted||[]).length );
+        dbg.textContent = `emps=${(employeesCache||[]).length} base=[${baseCounts.join(',')}] adj=[${adjCounts.join(',')}]`;
+      }
+    }catch(_e){/* ignore */}
+
     renderChanges(allAdjusted, allViolations);
     renderAbsenceSummary(uniqueAbsences);
 
