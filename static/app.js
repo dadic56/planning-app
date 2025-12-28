@@ -49,6 +49,15 @@ function isoWeekNumber(d){
   return weekNo;
 }
 
+function normalizeToMonday(isoDateStr){
+  if(!isoDateStr) return isoDateStr;
+  const d = new Date(isoDateStr + 'T00:00:00');
+  const wd = (d.getDay()+6)%7; // 0=Mon..6=Sun
+  if(wd === 0) return isoDateStr;
+  const monday = addDays(d, -wd);
+  return toISO(monday);
+}
+
 function employeeById(id){
   return employeesCache.find(e=>e.id === id);
 }
@@ -719,7 +728,8 @@ document.getElementById("absBtn").addEventListener("click", async ()=>{
   const start = document.getElementById("absStart").value;
   const end = document.getElementById("absEnd").value;
   const reason = document.getElementById("absReason").value;
-  const monday = document.getElementById("monday").value;
+  let monday = document.getElementById("monday").value;
+  monday = normalizeToMonday(monday);
   if(!ids.length||!start||!end){ alert("Sélectionnez au moins une vendeuse et des dates"); return; }
   try{
     for(const id of ids){
@@ -751,7 +761,9 @@ document.getElementById("gen").addEventListener("click", async ()=>{
   try{
     const weeks = Number(document.getElementById("weekCount").value || 1);
     const sundayOpen = document.getElementById("sun").checked;
-    const baseDate = new Date(`${monday}T00:00:00`);
+    const normalized = normalizeToMonday(monday);
+    if(normalized !== monday){ document.getElementById("monday").value = normalized; }
+    const baseDate = new Date(`${normalized}T00:00:00`);
     for(let i=0;i<weeks;i++){
       const weekMonday = toISO(addDays(baseDate, i*7));
       await generateWeek(weekMonday, sundayOpen);
@@ -806,6 +818,15 @@ if(snapshotBtn){
   const monday = new Date(now);
   monday.setDate(now.getDate()-wd);
   inp.value = monday.toISOString().slice(0,10);
+
+  // normalize manual changes: if user picks a non-Monday date, coerce to that week's Monday
+  inp.addEventListener('change', (ev)=>{
+    const val = ev.target.value;
+    const norm = normalizeToMonday(val);
+    if(norm !== val){ ev.target.value = norm; }
+    // refresh view for the corrected monday
+    refresh();
+  });
 
   const weekSelect = document.getElementById("weekCount");
   if(weekSelect){
