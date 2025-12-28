@@ -744,7 +744,7 @@ function setupViewTabs(){
       adjTables.forEach(el=>el.classList.remove('hidden'));
     }else if(view === 'base'){
       baseTables.forEach(el=>el.classList.remove('hidden'));
-      adjTables.forEach(el=>el=>el.classList.add('hidden'));
+      adjTables.forEach(el=>el.classList.add('hidden'));
     }else if(view === 'adjusted'){
       baseTables.forEach(el=>el.classList.add('hidden'));
       adjTables.forEach(el=>el.classList.remove('hidden'));
