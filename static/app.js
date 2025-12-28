@@ -466,6 +466,9 @@ function renderGrid(map, cov, hours, opts={}){
       const td=document.createElement("td");
       td.className="cell";
 
+      const tagsWrap = document.createElement('div');
+      tagsWrap.className = 'slot-list';
+
       let effective = effectiveSlots(dayEntry, useAdjusted).slice();
       const isoDate = (dayEntry.base[0]?.date) || (dayEntry.adjusted[0]?.date) || weekDates[dayIndex] || null;
       const absenceReason = (()=>{
@@ -478,7 +481,7 @@ function renderGrid(map, cov, hours, opts={}){
       if(absenceReason === null){
         const removed = useAdjusted ? removedShifts(dayEntry.base, dayEntry.adjusted) : [];
         removed.sort((a,b)=>minStr(a.start)-minStr(b.start)).forEach(s=>{
-          td.appendChild(makeTag(s, {ghost:true}));
+          tagsWrap.appendChild(makeTag(s, {ghost:true}));
         });
       }
       if(absenceReason !== null){
@@ -489,15 +492,17 @@ function renderGrid(map, cov, hours, opts={}){
         .forEach(s=>{
           const tag = makeTag(s);
           totalDay += slotMinutes(s);
-          td.appendChild(tag);
+          tagsWrap.appendChild(tag);
         });
 
       if(!effective.length && absenceReason !== null){
         const badge=document.createElement("div");
         badge.className = "day-flag absence";
         badge.textContent = absenceReason ? `Absence – ${absenceReason}` : "Absence";
-        td.appendChild(badge);
+        tagsWrap.appendChild(badge);
       }
+
+      td.appendChild(tagsWrap);
 
       const coversOpen = effective.some(s=>{
         const start = minStr(s.start);
