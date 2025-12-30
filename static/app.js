@@ -487,13 +487,16 @@ function renderGrid(map, cov, hours, opts={}){
 
       let effective = effectiveSlots(dayEntry, useAdjusted).slice();
       const isoDate = (dayEntry.base[0]?.date) || (dayEntry.adjusted[0]?.date) || weekDates[dayIndex] || null;
-      const absenceReason = (()=>{
+      
+      // Les absences n'affectent QUE le planning ajusté, jamais le planning de base
+      const absenceReason = useAdjusted ? (()=>{
         if(!isoDate) return null;
         const byEmp = absenceDays.get(empId);
         if(!byEmp) return null;
         if(!byEmp.has(isoDate)) return null;
         return byEmp.get(isoDate);
-      })();
+      })() : null;
+      
       if(absenceReason === null){
         const removed = useAdjusted ? removedShifts(dayEntry.base, dayEntry.adjusted) : [];
         removed.sort((a,b)=>minStr(a.start)-minStr(b.start)).forEach(s=>{
