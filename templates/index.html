@@ -302,7 +302,23 @@
     const dbg = document.getElementById('debugInfo')?.textContent || '(no debugInfo)';
     let errors = window.__debugErrors__ || [];
     const errText = errors.length ? ('Errors:\n' + errors.join('\n')) : 'Errors: none';
-    content.textContent = `${dbg}\n\n${errText}`;
+
+    // gather table/DOM diagnostics
+    const rows = Array.from(document.querySelectorAll('#tbody0 tr'));
+    const nrows = rows.length;
+    let colsInfo = 'no rows';
+    if(rows[0]){
+      const tds = Array.from(rows[0].querySelectorAll('td'));
+      colsInfo = tds.map((td,i)=>{
+        try{
+          const cs = getComputedStyle(td);
+          const txt = td.innerText.replace(/\n+/g,' | ').trim().slice(0,140);
+          return `col${i}: offset=${td.offsetWidth} client=${td.clientWidth} display=${cs.display} whiteSpace=${cs.whiteSpace} text="${txt}"`;
+        }catch(e){ return `col${i}: error`; }
+      }).join('\n');
+    }
+
+    content.textContent = `DBG: ${dbg}\nrows=${nrows}\n\n${colsInfo}\n\n${errText}`;
   }
 
   window.__debugErrors__ = window.__debugErrors__ || [];
