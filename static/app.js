@@ -475,9 +475,6 @@ function renderGrid(map, cov, hours, opts={}){
     }
     tr.appendChild(tdName);
 
-    const openDays = [];
-    const closeDays = [];
-
     days.forEach((dayEntry, dayIndex)=>{
       const td=document.createElement("td");
       td.className="cell";
@@ -520,19 +517,6 @@ function renderGrid(map, cov, hours, opts={}){
 
       td.appendChild(tagsWrap);
 
-      const coversOpen = effective.some(s=>{
-        const start = minStr(s.start);
-        const end = minStr(s.end) - 1;
-        return start <= openMinute && openMinute <= end;
-      });
-      const coversClose = effective.some(s=>{
-        const start = minStr(s.start);
-        const end = minStr(s.end) - 1;
-        return start <= closeMinute && closeMinute <= end;
-      });
-      if(coversOpen) openDays.push(shortWd[dayIndex]);
-      if(coversClose) closeDays.push(shortWd[dayIndex]);
-
       const totalLine = document.createElement("div");
       totalLine.className = "day-total";
       totalLine.textContent = `Total: ${spanStr(totalDay)}h`;
@@ -540,13 +524,6 @@ function renderGrid(map, cov, hours, opts={}){
 
       tr.appendChild(td);
     });
-
-    const tdO = document.createElement("td");
-    const tdF = document.createElement("td");
-    tdO.className="small"; tdF.className="small";
-    tdO.textContent = openDays.length ? openDays.join(', ') : "—";
-    tdF.textContent = closeDays.length ? closeDays.join(', ') : "—";
-    tr.appendChild(tdO); tr.appendChild(tdF);
 
     const tdT = document.createElement("td");
     const m = hours[name]||0;
@@ -598,8 +575,6 @@ function renderGrid(map, cov, hours, opts={}){
       `;
     }
   }
-  if(ctx.ocov) ctx.ocov.textContent = "≥3 à 09:30";
-  if(ctx.fcov) ctx.fcov.textContent = "≥3 à 19:00";
 }
 
 async function refresh(){
