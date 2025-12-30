@@ -63,7 +63,25 @@ L'outil vise une responsable de boutique qui l’utilise depuis un navigateur de
 - Stéphanie : jamais le vendredi.
 - Ces règles sont stockées dans `Employee.special_rules` et appliquées lors de la génération.
 
-### 3.5 Ouvertures spéciales (roadmap)
+### 3.5 Absences et redistribution automatique
+1. **Déclaration** : Ajouter l'absence via `/api/absences` (ou le formulaire UI) avec date début/fin et motif.
+2. **Suppression des créneaux** : Le générateur (`generate_adjusted_week`) retire automatiquement tous les créneaux de la personne absente sur la période.
+3. **Recherche de remplaçante** pour chaque créneau supprimé :
+   - **Priorité aux contrats 24h** (Clara, Nathalie) pour répartir la charge en premier
+   - Si aucune 24h disponible, recherche parmi les **35h**
+   - Critères de disponibilité :
+     - Pas déjà absente ce jour-là
+     - Ne dépasse pas son plafond horaire hebdo (heures déjà planifiées + nouveau créneau ≤ plafond)
+     - Pas de chevauchement avec un shift existant
+     - Respect de la pause obligatoire (1h minimum entre deux shifts)
+     - Pas plus de 6h consécutives sans pause déjeuner
+     - Respect des règles individuelles (ex: Stéphanie jamais le vendredi)
+     - Disponible le dimanche si c'est un dimanche
+4. **Création du remplacement** : Si une remplaçante est trouvée, création d'un `AdjustedShift` avec `source="reassigned"` (tag orange dans l'UI)
+5. **Échec de remplacement** : Si aucune remplaçante n'est trouvée, enregistrement d'une `RuleViolation` avec code `SHIFT_UNASSIGNED` et détail des raisons (toutes en heures sup, indisponibles, règles bloquantes...)
+6. **Résumé détaillé** : Le générateur retourne les métadonnées de tous les remplacements effectués (qui → qui, créneau, impact heures) et les échecs avec suggestions d'actions.
+
+### 3.6 Ouvertures spéciales (roadmap)
 Le modèle existe déjà dans la base, mais aucune interface n’est fournie dans la version courante. L’intégration (saisie, affectation, injection dans la génération) est repoussée à une itération ultérieure.
 
 ## 4. API (v1)
