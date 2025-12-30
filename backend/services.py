@@ -413,7 +413,31 @@ def list_adjusted_between(d1: date, d2: date) -> List[Dict[str, Any]]:
     q = AdjustedShift.query\
         .filter(AdjustedShift.date >= d1, AdjustedShift.date <= d2)\
         .order_by(AdjustedShift.date, AdjustedShift.employee_id, AdjustedShift.start_time)
-    for s in q.all():
+    rows = q.all()
+    
+    # Si aucun planning ajusté n'existe, retourner le planning de base comme ajusté initial
+    if not rows:
+        # Calculer le lundi de d1
+        wd = (d1.weekday())  # 0=lundi
+        monday = d1 - timedelta(days=wd)
+        base_data = compute_base_week_for(monday)
+        # Filtrer pour la plage demandée
+        for item in base_data:
+            item_date = date.fromisoformat(item["date"])
+            if d1 <= item_date <= d2:
+                out.append({
+                    "date": item["date"],
+                    "employee_id": item["employee_id"],
+                    "employee": item["employee"],
+                    "start": item["start"],
+                    "end": item["end"],
+                    "lunch_start": item.get("lunch_start"),
+                    "lunch_end": item.get("lunch_end"),
+                    "source": "base",
+                })
+        return out
+    
+    for s in rows:
         emp = emp_by_id.get(s.employee_id)
         out.append({
             "date": s.date.isoformat(),
@@ -426,3 +450,4 @@ def list_adjusted_between(d1: date, d2: date) -> List[Dict[str, Any]]:
             "source": (s.source or "adjust"),
         })
     return out
+
