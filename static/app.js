@@ -467,7 +467,8 @@ function renderGrid(map, cov, hours, opts={}){
     const tdName = document.createElement("td");
     tdName.className = "left-sticky name";
     const empId = nameToId.get(name);
-    if(empId && absentIds.has(empId)){
+    // Le badge "Absente" ne doit apparaître que dans le planning ajusté
+    if(useAdjusted && empId && absentIds.has(empId)){
       tdName.classList.add("absent");
       tdName.innerHTML = `${name} <span class="badge-absence">Absente</span>`;
     }else{
