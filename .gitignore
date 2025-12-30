@@ -4,6 +4,12 @@ __pycache__/
 .flaskenv
 instance/
 venv/
+.venv/
 dist/
 build/
 *.sqlite3
+*.db
+.DS_Store
+*.log
+.pytest_cache/
+.coverage
