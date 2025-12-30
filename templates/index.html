@@ -17,8 +17,12 @@
   .btn:hover{opacity:0.9;transform:translateY(-1px)}
   .btn-secondary{background:#fff;color:#0a84ff;border:1px solid #0a84ff}
   .tab-btn{background:#f0f4f8;color:#555;border:1px solid #d1dce5;font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:0.05em;padding:10px 16px;border-radius:8px;cursor:pointer;transition:all 0.2s ease}
-  .tab-btn:hover{background:#e3eaf1;border-color:#0a84ff;color:#0a84ff}
-  .tab-btn.active{background:#0a84ff;color:#fff;border-color:#0a84ff;font-weight:700;box-shadow:0 3px 12px rgba(10,132,255,0.35);transform:translateY(-1px)}
+  .tab-btn:hover{background:#e3eaf1;border-color:#10b981;color:#0b7a3e}
+  .tab-btn.active{font-weight:700;box-shadow:0 3px 12px rgba(16,185,129,0.35);transform:translateY(-1px)}
+  .tab-btn[data-view="both"].active, .tab-btn[data-view="base"].active{background:#10b981;color:#fff;border-color:#10b981}
+  .tab-btn[data-view="both"]:hover, .tab-btn[data-view="base"]:hover{border-color:#10b981;color:#0b7a3e}
+  .tab-btn[data-view="adjusted"].active{background:#0a84ff;color:#fff;border-color:#0a84ff;box-shadow:0 3px 12px rgba(10,132,255,0.35)}
+  .tab-btn[data-view="adjusted"]:hover{border-color:#0a84ff;color:#0a84ff}
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .spacer{flex:1}
   .grid{overflow:auto;padding:12px}
@@ -62,7 +66,9 @@
   .muted{color:var(--muted)}
   tfoot td{font-weight:600;background:#fbfbfb}
   .small{font-size:11px}
-  .subtable h4{font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#0a84ff;margin:0 0 12px 0;padding:8px 12px;background:linear-gradient(135deg, #e8f3ff 0%, #f5f9ff 100%);border-left:4px solid #0a84ff;border-radius:4px}
+  .subtable h4{font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px 0;padding:8px 12px;border-radius:4px}
+  .subtable h4.base-label{color:#0b7a3e;background:linear-gradient(135deg, #e6f9f0 0%, #f0fdf7 100%);border-left:4px solid #10b981}
+  .subtable h4.adjusted-label{color:#0a84ff;background:linear-gradient(135deg, #e8f3ff 0%, #f5f9ff 100%);border-left:4px solid #0a84ff}
   .ok{color:#0a7a0a;font-weight:600}
   .ko{color:#a20b0b;font-weight:600}
   .panel{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
@@ -180,9 +186,9 @@
         <h3 class="week-title" id="weekTitle0">Semaine 1</h3>
         <p class="week-subtitle" id="weekSubtitle0"></p>
       </div>
-      <!-- Base schedule (bleu) -->
+      <!-- Base schedule (vert) -->
       <div class="subtable">
-      <h4>Planning de base</h4>
+      <h4 class="base-label">Planning de base</h4>
       <table>
         <thead class="top-sticky">
           <tr>
@@ -202,9 +208,9 @@
       </table>
       </div>
 
-      <!-- Adjusted schedule (vert) rendered below for comparison -->
+      <!-- Adjusted schedule (bleu) rendered below for comparison -->
       <div class="subtable adjusted-block" id="adjustedBlock0">
-      <h4>Planning ajusté</h4>
+      <h4 class="adjusted-label">Planning ajusté</h4>
       <table>
         <thead class="top-sticky">
           <tr>
@@ -230,7 +236,7 @@
         <p class="week-subtitle" id="weekSubtitle1"></p>
       </div>
       <div class="subtable">
-      <h4>Planning de base</h4>
+      <h4 class="base-label">Planning de base</h4>
       <table>
         <thead class="top-sticky">
           <tr>
@@ -251,7 +257,7 @@
       </div>
 
       <div class="subtable adjusted-block" id="adjustedBlock1">
-      <h4>Planning ajusté</h4>
+      <h4 class="adjusted-label">Planning ajusté</h4>
       <table>
         <thead class="top-sticky">
           <tr>
