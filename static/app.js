@@ -241,7 +241,7 @@ function weeklyHours(map, useAdjusted, absenceByName, weekDates){
   return sum;
 }
 
-function renderChanges(adjusted, violations){
+function renderChanges(adjusted, violations, reassignments = [], unassigned = []){
   const ul = document.getElementById("changes");
   if(!ul) return;
   ul.innerHTML = "";
@@ -282,8 +282,20 @@ function renderChanges(adjusted, violations){
   };
 
   const changeItems = [];
+  
+  // Add detailed reassignment items
+  reassignments.forEach(r => {
+    const d = new Date(r.date);
+    const wd = wdNames[(d.getDay()+6)%7];
+    changeItems.push({
+      severity: "medium",
+      label: `Remplacement : ${r.replacement_employee} (${r.replacement_contract})`,
+      detail: `${wd} – Remplace ${r.original_employee} sur ${r.shift} (${r.duration_hours.toFixed(1)}h) – Motif: ${r.reason}`
+    });
+  });
+  
   adjusted.forEach(r => {
-    if(r.source && r.source !== "base"){
+    if(r.source && r.source !== "base" && r.source !== "reassigned"){
       const d = new Date(r.date);
       const wd = wdNames[(d.getDay()+6)%7];
       const labelText = changeLabels[r.source] || r.source;
