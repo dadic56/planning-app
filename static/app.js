@@ -479,6 +479,9 @@ function renderGrid(map, cov, hours, opts={}){
       const td=document.createElement("td");
       td.className="cell";
 
+      const cellInner = document.createElement('div');
+      cellInner.className = 'cell-inner';
+
       const tagsWrap = document.createElement('div');
       tagsWrap.className = 'slot-list';
 
@@ -515,13 +518,14 @@ function renderGrid(map, cov, hours, opts={}){
         tagsWrap.appendChild(badge);
       }
 
-      td.appendChild(tagsWrap);
+      cellInner.appendChild(tagsWrap);
 
       const totalLine = document.createElement("div");
       totalLine.className = "day-total";
       totalLine.textContent = `Total: ${spanStr(totalDay)}h`;
-      td.appendChild(totalLine);
+      cellInner.appendChild(totalLine);
 
+      td.appendChild(cellInner);
       tr.appendChild(td);
     });
 
