@@ -34,8 +34,9 @@
   .top-sticky{position:sticky;top:0;z-index:6}
   .name{font-weight:600}
   .cell{min-width:140px;min-height:64px}
-  td.cell{display:flex;flex-direction:column;justify-content:space-between}
-  .slot-list{display:flex;flex-direction:column;gap:6px;width:100%}
+  td.cell{display:table-cell;vertical-align:top}
+  /* inner container holds the flexible layout so table semantics remain intact */
+  .slot-list{display:flex;flex-direction:column;gap:6px;width:100%;height:100%;justify-content:space-between}
   .tag{white-space:normal}
   th:first-child, td.left-sticky{width:200px}
   .tag{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:4px 8px;border-radius:12px;margin:2px 0;gap:8px}
