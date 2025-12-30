@@ -277,5 +277,52 @@
 </div>
 
 <script src="/app.js"></script>
+<!-- Debug overlay (visible en bas à droite) -->
+<div id="debugOverlay" style="position:fixed;right:12px;bottom:12px;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:8px;max-width:420px;max-height:50vh;overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.15);font-family:monospace;font-size:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong>Debug</strong>
+    <button id="debugClose" style="background:transparent;border:none;cursor:pointer">✕</button>
+  </div>
+  <div id="debugOverlayContent" style="white-space:pre-wrap;margin-top:6px"></div>
+  <div style="margin-top:6px;display:flex;gap:6px">
+    <button id="debugRefresh" class="btn btn-secondary" type="button">Rafraîchir</button>
+    <button id="debugCopy" class="btn" type="button">Copier</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const overlay = document.getElementById('debugOverlay');
+  const content = document.getElementById('debugOverlayContent');
+  const closeBtn = document.getElementById('debugClose');
+  const copyBtn = document.getElementById('debugCopy');
+  const refreshBtn = document.getElementById('debugRefresh');
+
+  function update(){
+    const dbg = document.getElementById('debugInfo')?.textContent || '(no debugInfo)';
+    let errors = window.__debugErrors__ || [];
+    const errText = errors.length ? ('Errors:\n' + errors.join('\n')) : 'Errors: none';
+    content.textContent = `${dbg}\n\n${errText}`;
+  }
+
+  window.__debugErrors__ = window.__debugErrors__ || [];
+  const origConsoleError = console.error.bind(console);
+  console.error = function(...args){
+    try{ window.__debugErrors__.push(args.map(a=>String(a)).join(' ')); }catch(e){}
+    origConsoleError(...args);
+    update();
+  };
+  window.addEventListener('error', function(ev){
+    try{ window.__debugErrors__.push(ev.message + ' at ' + ev.filename + ':' + ev.lineno); }catch(e){}
+    update();
+  });
+  closeBtn.addEventListener('click', ()=> overlay.style.display='none');
+  copyBtn.addEventListener('click', ()=>{
+    navigator.clipboard.writeText(content.textContent).then(()=>alert('Copié'), ()=>alert('Impossible de copier'));
+  });
+  refreshBtn.addEventListener('click', update);
+  setTimeout(update, 200);
+})();
+</script>
 </body>
 </html>
