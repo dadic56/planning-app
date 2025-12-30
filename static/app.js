@@ -380,6 +380,13 @@ function makeTag(slot, opts={}){
   const ghostClass = ghost ? " ghost" : "";
   const tag=document.createElement("div");
   tag.className = `tag ${slot.type}${modClass}${ghostClass}`;
+  // inline styles to avoid external theme/extension overriding layout
+  tag.style.display = 'flex';
+  tag.style.alignItems = 'center';
+  tag.style.justifyContent = 'space-between';
+  tag.style.gap = '8px';
+  tag.style.padding = '4px 8px';
+  tag.style.boxSizing = 'border-box';
 
   const spanRange=document.createElement("span");
   spanRange.className="range";
@@ -776,6 +783,34 @@ function enforceLightTheme(){
     const s = document.createElement('style'); s.id = 'force-light-mode'; s.appendChild(document.createTextNode(css));
     document.head && document.head.appendChild(s);
   }catch(e){ console.warn('enforceLightTheme failed', e); }
+}
+
+// More aggressive: apply inline styles repeatedly to override extensions that inject dark mode
+function enforceLightThemeInline(){
+  try{
+    const applyOnce = ()=>{
+      try{
+        document.documentElement.style.backgroundColor = '#fff';
+        document.documentElement.style.color = '#111';
+        document.body && (document.body.style.backgroundColor = '#fff');
+        document.body && (document.body.style.color = '#111');
+        const els = document.querySelectorAll('header, .week-block, table, th, td, .panel, .changes, .meta-block');
+        els.forEach(el=>{
+          try{ el.style.backgroundColor = '#fff'; el.style.color = '#111'; }catch(_){}
+        });
+        // ensure tags look correct
+        document.querySelectorAll('.tag').forEach(t=>{
+          try{
+            t.style.backgroundClip = 'padding-box';
+            t.style.display = 'flex'; t.style.justifyContent = 'space-between'; t.style.gap = '8px';
+            t.style.padding = '4px 8px';
+          }catch(_){ }
+        });
+      }catch(_){ }
+    };
+    // apply multiple times over a short period
+    for(let i=0;i<8;i++) setTimeout(applyOnce, i*300);
+  }catch(e){ console.warn('enforceLightThemeInline failed', e); }
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
