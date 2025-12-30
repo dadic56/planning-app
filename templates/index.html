@@ -34,6 +34,9 @@
   .title-block{display:flex;flex-direction:column;align-items:flex-start;margin-right:12px}
   .week-block{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.08);padding:12px}
   .week-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .week-header .left-section{display:flex;align-items:center;gap:12px}
+  .week-alert-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;background:#fff0da;color:#a05b0e;border:1px solid #ffd89f;text-transform:uppercase;letter-spacing:0.05em}
+  .week-alert-badge::before{content:'⚠️';font-size:14px}
   .week-title{margin:0;font-size:18px;color:#0f172a}
   .week-subtitle{margin:0;font-size:12px;color:#64748b}
   table{border-collapse:collapse;width:100%;max-width:100%;table-layout:auto}
@@ -185,7 +188,10 @@
   <div class="weeks-wrapper">
     <section class="week-block" id="weekBlock0">
       <div class="week-header">
-        <h3 class="week-title" id="weekTitle0">Semaine 1</h3>
+        <div class="left-section">
+          <h3 class="week-title" id="weekTitle0">Semaine 1</h3>
+          <span class="week-alert-badge hidden" id="weekAlert0"></span>
+        </div>
         <p class="week-subtitle" id="weekSubtitle0"></p>
       </div>
       <!-- Base schedule (vert) -->
@@ -234,7 +240,10 @@
     </section>
     <section class="week-block hidden" id="weekBlock1">
       <div class="week-header">
-        <h3 class="week-title" id="weekTitle1">Semaine 2</h3>
+        <div class="left-section">
+          <h3 class="week-title" id="weekTitle1">Semaine 2</h3>
+          <span class="week-alert-badge hidden" id="weekAlert1"></span>
+        </div>
         <p class="week-subtitle" id="weekSubtitle1"></p>
       </div>
       <div class="subtable">

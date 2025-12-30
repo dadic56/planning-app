@@ -656,6 +656,20 @@ async function refresh(){
       if(ctx.title) ctx.title.textContent = `Semaine ${idx+1}`;
       if(ctx.subtitle) ctx.subtitle.textContent = `${formatDateFR(weekData.monday)} → ${formatDateFR(weekData.sunday)}`;
 
+      // Update week alert badge if absences exist
+      const alertBadge = document.getElementById(`weekAlert${idx}`);
+      if(alertBadge){
+        if(weekData.absences && weekData.absences.length > 0){
+          const count = weekData.absences.length;
+          const label = count === 1 ? '1 absence' : `${count} absences`;
+          alertBadge.textContent = label;
+          alertBadge.classList.remove('hidden');
+        }else{
+          alertBadge.textContent = '';
+          alertBadge.classList.add('hidden');
+        }
+      }
+
       const map = groupByEmployeeAndDay(weekData.base, weekData.adjusted);
       const mondayDate = new Date(`${weekData.monday}T00:00:00`);
       const weekDates = Array.from({length:7}, (_,dayIdx)=> toISO(addDays(mondayDate, dayIdx)));
