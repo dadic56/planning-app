@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
-from app import db
-from .models import BaseShift, AdjustedShift, RuleViolation, Absence, Employee
+from .models import db, BaseShift, AdjustedShift, RuleViolation, Absence, Employee
 
 
 def _hm_to_minutes(hm: str) -> int:

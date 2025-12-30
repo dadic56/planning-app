@@ -382,11 +382,13 @@ def create_app():
     @app.post("/api/generate-week")
     def api_generate_week():
         try:
+            from .generator import generate_week as gen_week
             monday = _safe_monday(request)
             sunday_open = request.args.get("sunday_open") == "1"
-            generate_adjusted_week(monday, sunday_open=sunday_open)
-            return jsonify({"ok": True})
+            result = gen_week(monday.isoformat(), sunday_open=sunday_open)
+            return jsonify(result)
         except Exception as e:
+            app.logger.exception("generate_week error")
             return jsonify({"ok": False, "where": "generate-week", "error": type(e).__name__, "detail": str(e)}), 500
 
     @app.get("/api/adjusted")
