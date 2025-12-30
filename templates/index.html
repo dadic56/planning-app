@@ -17,10 +17,12 @@
   .btn:hover{opacity:0.9;transform:translateY(-1px)}
   .btn-secondary{background:#fff;color:#0a84ff;border:1px solid #0a84ff}
   .tab-btn{background:#f0f4f8;color:#555;border:1px solid #d1dce5;font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:0.05em;padding:10px 16px;border-radius:8px;cursor:pointer;transition:all 0.2s ease}
-  .tab-btn:hover{background:#e3eaf1;border-color:#10b981;color:#0b7a3e}
-  .tab-btn.active{font-weight:700;box-shadow:0 3px 12px rgba(16,185,129,0.35);transform:translateY(-1px)}
-  .tab-btn[data-view="both"].active, .tab-btn[data-view="base"].active{background:#10b981;color:#fff;border-color:#10b981}
-  .tab-btn[data-view="both"]:hover, .tab-btn[data-view="base"]:hover{border-color:#10b981;color:#0b7a3e}
+  .tab-btn:hover{background:#e3eaf1}
+  .tab-btn.active{font-weight:700;transform:translateY(-1px)}
+  .tab-btn[data-view="both"].active{background:linear-gradient(135deg, #10b981 0%, #0a84ff 100%);color:#fff;border:none;box-shadow:0 3px 12px rgba(10,185,129,0.4)}
+  .tab-btn[data-view="both"]:hover{border-color:#10b981;color:#0b7a3e}
+  .tab-btn[data-view="base"].active{background:#10b981;color:#fff;border-color:#10b981;box-shadow:0 3px 12px rgba(16,185,129,0.35)}
+  .tab-btn[data-view="base"]:hover{border-color:#10b981;color:#0b7a3e}
   .tab-btn[data-view="adjusted"].active{background:#0a84ff;color:#fff;border-color:#0a84ff;box-shadow:0 3px 12px rgba(10,132,255,0.35)}
   .tab-btn[data-view="adjusted"]:hover{border-color:#0a84ff;color:#0a84ff}
   .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -130,7 +132,7 @@
 </header>
 
 <nav class="view-tabs" style="padding:8px 16px;border-bottom:1px solid var(--line);">
-  <button class="tab-btn btn-secondary active" data-view="both" type="button">Vue côte-à-côte</button>
+  <button class="tab-btn btn-secondary active" data-view="both" type="button">Comparaison planning</button>
   <button class="tab-btn btn-secondary" data-view="base" type="button">Voir uniquement base</button>
   <button class="tab-btn btn-secondary" data-view="adjusted" type="button">Voir uniquement ajusté</button>
 </nav>
